@@ -1,101 +1,166 @@
 libros = []
-bd = libros
-modo = "normal"
-ultimo_error = ""
 
 
-def _mostrar_mensaje(mensaje, complemento="", tipo=0):
-    if tipo == 1:
-        print(mensaje + complemento)
-    elif tipo == 2:
-        print(mensaje)
-    else:
-        print(str(mensaje))
+class Libro:
 
+    def __init__(self, id, titulo, autor, isbn="", disponible=True):
+        self.id = id
+        self.titulo = titulo
+        self.autor = autor
+        self.isbn = isbn
+        self.disponible = disponible
 
-def _cambiar_disponibilidad(accion, libro):
-    if accion == "prestar":
-        libro["disponible"] = False
-        _mostrar_mensaje("Se presto el libro", tipo=2)
-        return "Libro prestado"
+    def __getitem__(self, clave):
+        if clave == "id":
+            return self.id
 
-    if accion == "devolver":
-        libro["disponible"] = True
-        _mostrar_mensaje("Se devolvio el libro", tipo=2)
-        return "Libro devuelto"
+        if clave == "titulo":
+            return self.titulo
 
-    return "Nada"
+        if clave == "autor":
+            return self.autor
+
+        if clave == "isbn":
+            return self.isbn
+
+        if clave == "disponible":
+            return self.disponible
+
+        raise KeyError(clave)
+
+    def __setitem__(self, clave, valor):
+        if clave == "id":
+            self.id = valor
+        elif clave == "titulo":
+            self.titulo = valor
+        elif clave == "autor":
+            self.autor = valor
+        elif clave == "isbn":
+            self.isbn = valor
+        elif clave == "disponible":
+            self.disponible = valor
+        else:
+            raise KeyError(clave)
 
 
 def agregar_libro(titulo, autor):
-    global ultimo_error
-
-    nuevo_libro = {
-        "titulo": titulo,
-        "autor": autor,
-        "disponible": True,
-    }
-
-    if modo == "normal":
-        bd.append(nuevo_libro)
-        ultimo_error = ""
-    else:
-        ultimo_error = "modo desconocido"
-
-    _mostrar_mensaje("Libro agregado: ", titulo, 1)
+    nuevo_id = len(libros) + 1
+    libro = Libro(nuevo_id, titulo, autor)
+    libros.append(libro)
 
 
-def buscar_libro(titulo):
-    for libro in bd:
-        if libro.get("titulo") == titulo:
+def prestar_libro(titulo):
+    for libro in libros:
+        if libro.titulo == titulo:
+            if libro.disponible:
+                libro.disponible = False
+                return "Libro prestado"
+
+            return "Libro no disponible"
+
+    return "Libro no encontrado"
+
+
+def devolver_libro(titulo):
+    for libro in libros:
+        if libro.titulo == titulo:
+            if not libro.disponible:
+                libro.disponible = True
+                return "Libro devuelto"
+
+            return "El libro no estaba prestado"
+
+    return "Libro no encontrado"
+
+
+def crear_libro(id, titulo, autor, isbn, disponible=True):
+    libro = Libro(id, titulo, autor, isbn, disponible)
+    libros.append(libro)
+    return libro
+
+
+def obtener_libro_por_id(id):
+    for libro in libros:
+        if libro.id == id:
             return libro
 
     return None
 
 
-def prestar_libro(titulo):
-    global ultimo_error
-
-    libro_encontrado = buscar_libro(titulo)
-
-    if libro_encontrado is None:
-        _mostrar_mensaje("No se encontro el libro", tipo=2)
-        ultimo_error = "Libro no encontrado"
-        return "Libro no encontrado"
-
-    if not libro_encontrado["disponible"]:
-        _mostrar_mensaje("El libro no esta disponible", tipo=2)
-        ultimo_error = "Libro no disponible"
-        return "Libro no disponible"
-
-    ultimo_error = ""
-    return _cambiar_disponibilidad("prestar", libro_encontrado)
+def buscar_libro_por_id(id):
+    return obtener_libro_por_id(id)
 
 
-def devolver_libro(titulo):
-    global ultimo_error
+def actualizar_libro(id, titulo=None, autor=None, isbn=None, disponible=None):
+    libro = obtener_libro_por_id(id)
 
-    libro_encontrado = buscar_libro(titulo)
+    if libro is None:
+        return False
 
-    if libro_encontrado is None:
-        _mostrar_mensaje("No se encontro el libro", tipo=2)
-        ultimo_error = "Libro no encontrado"
-        return "Libro no encontrado"
+    if titulo is not None:
+        libro.titulo = titulo
 
-    if libro_encontrado["disponible"]:
-        _mostrar_mensaje("El libro ya estaba disponible", tipo=2)
-        ultimo_error = "Libro ya disponible"
-        return "Libro ya disponible"
+    if autor is not None:
+        libro.autor = autor
 
-    ultimo_error = ""
-    return _cambiar_disponibilidad("devolver", libro_encontrado)
+    if isbn is not None:
+        libro.isbn = isbn
+
+    if disponible is not None:
+        libro.disponible = disponible
+
+    return True
 
 
-def mostrar_libros():
-    if not bd:
-        _mostrar_mensaje("No hay libros", tipo=2)
-        return
+def eliminar_libro(id):
+    libro = obtener_libro_por_id(id)
 
-    for libro in bd:
-        estado = "Disponible" if libro["disponible"] else "Prestado"
-        print(f"{libro['titulo']} - {libro['autor']} - {estado}")
+    if libro is None:
+        return False
+
+    libros.remove(libro)
+    return True
+
+
+def buscar_libros_por_titulo(titulo):
+    resultado = []
+
+    for libro in libros:
+        if libro.titulo == titulo:
+            resultado.append(libro)
+
+    return resultado
+
+
+def buscar_libros_por_autor(autor):
+    resultado = []
+
+    for libro in libros:
+        if libro.autor == autor:
+            resultado.append(libro)
+
+    return resultado
+
+
+def buscar_libros_por_disponibilidad(disponible):
+    resultado = []
+
+    for libro in libros:
+        if libro.disponible == disponible:
+            resultado.append(libro)
+
+    return resultado
+
+
+def buscar_libros_por_coincidencia(texto):
+    resultado = []
+    texto = texto.lower()
+
+    for libro in libros:
+        titulo = libro.titulo.lower()
+        autor = libro.autor.lower()
+
+        if texto in titulo or texto in autor:
+            resultado.append(libro)
+
+    return resultado
