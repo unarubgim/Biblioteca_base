@@ -164,3 +164,107 @@ def buscar_libros_por_coincidencia(texto):
             resultado.append(libro)
 
     return resultado
+
+usuarios = []
+
+
+class Usuario:
+    def __init__(self, id, nombre, apellidos, email, habilitado=True):
+        self.id = id
+        self.nombre = nombre
+        self.apellidos = apellidos
+        self.email = email
+        self.habilitado = habilitado
+
+
+def crear_usuario(id, nombre, apellidos, email, habilitado=True):
+    usuario = Usuario(id, nombre, apellidos, email, habilitado)
+    usuarios.append(usuario)
+    return usuario
+
+
+def obtener_usuario_por_id(id):
+    for usuario in usuarios:
+        if usuario.id == id:
+            return usuario
+
+    return None
+
+
+def actualizar_usuario(id, nombre=None, apellidos=None, email=None, habilitado=None):
+    usuario = obtener_usuario_por_id(id)
+
+    if usuario is None:
+        return False
+
+    if nombre is not None:
+        usuario.nombre = nombre
+
+    if apellidos is not None:
+        usuario.apellidos = apellidos
+
+    if email is not None:
+        usuario.email = email
+
+    if habilitado is not None:
+        usuario.habilitado = habilitado
+
+    return True
+
+
+def eliminar_usuario(id):
+    usuario = obtener_usuario_por_id(id)
+
+    if usuario is None:
+        return False
+
+    usuarios.remove(usuario)
+    return True
+
+
+def habilita_usuario(id):
+    usuario = obtener_usuario_por_id(id)
+
+    if usuario is None:
+        return False
+
+    usuario.habilitado = True
+    return True
+
+
+def deshabilita_usuario(id):
+    usuario = obtener_usuario_por_id(id)
+
+    if usuario is None:
+        return False
+
+    usuario.habilitado = False
+    return True
+
+
+def buscar_usuarios_por_nombre(nombre):
+    resultado = []
+
+    for usuario in usuarios:
+        if usuario.nombre == nombre:
+            resultado.append(usuario)
+
+    return resultado
+
+
+def buscar_usuarios_por_apellidos(apellidos):
+    resultado = []
+
+    for usuario in usuarios:
+        if usuario.apellidos == apellidos:
+            resultado.append(usuario)
+
+    return resultado
+
+
+def buscar_usuario_por_email(email):
+    for usuario in usuarios:
+        if usuario.email == email:
+            return usuario
+
+    return None
