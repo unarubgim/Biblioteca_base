@@ -135,3 +135,21 @@ def mostrar_libros():
                     salida = salida + " - " + p
             print(salida)
             contador = contador + 1
+
+usuarios = []
+
+
+class Usuario:
+
+    def __init__(self, id, nombre, apellidos, email, habilitado=True):
+        self.id = id
+        self.nombre = nombre
+        self.apellidos = apellidos
+        self.email = email
+        self.habilitado = habilitado
+
+
+def crear_usuario(id, nombre, apellidos, email, habilitado=True):
+    usuario = Usuario(id, nombre, apellidos, email, habilitado)
+    usuarios.append(usuario)
+    return usuario
