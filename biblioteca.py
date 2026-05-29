@@ -331,3 +331,34 @@ def registrar_log(mensaje):
 
 def obtener_logs():
     return logs
+
+def operar(accion, datos):
+    if accion == "crear_libro":
+        return crear_libro(
+            datos["id"],
+            datos["titulo"],
+            datos["autor"],
+            datos["isbn"]
+        )
+
+    if accion == "crear_usuario":
+        return crear_usuario(
+            datos["id"],
+            datos["nombre"],
+            datos["apellidos"],
+            datos["email"]
+        )
+
+    if accion == "prestar_libro":
+        return prestar_libro(
+            datos["libro_id"],
+            datos["usuario_id"]
+        )
+
+    if accion == "devolver_libro":
+        return devolver_libro(
+            datos["libro_id"],
+            datos["usuario_id"]
+        )
+
+    return False
