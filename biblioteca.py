@@ -1,4 +1,5 @@
 libros = []
+prestamos = []
 
 
 class Libro:
@@ -61,16 +62,36 @@ def prestar_libro(titulo):
     return "Libro no encontrado"
 
 
-def devolver_libro(titulo):
-    for libro in libros:
-        if libro.titulo == titulo:
-            if not libro.disponible:
-                libro.disponible = True
-                return "Libro devuelto"
+def devolver_libro(libro_id, usuario_id=None):
+    if usuario_id is None:
+        titulo = libro_id
 
-            return "El libro no estaba prestado"
+        for libro in libros:
+            if libro.titulo == titulo:
+                if not libro.disponible:
+                    libro.disponible = True
+                    return "Libro devuelto"
 
-    return "Libro no encontrado"
+                return "El libro no estaba prestado"
+
+        return "Libro no encontrado"
+
+    libro = obtener_libro_por_id(libro_id)
+    usuario = obtener_usuario_por_id(usuario_id)
+
+    if libro is None:
+        return "Libro no encontrado"
+
+    if usuario is None:
+        return "Usuario no encontrado"
+
+    for prestamo in prestamos:
+        if prestamo["libro_id"] == libro_id and prestamo["usuario_id"] == usuario_id:
+            prestamos.remove(prestamo)
+            libro.disponible = True
+            return "Libro devuelto"
+
+    return "Prestamo no encontrado"
 
 
 def crear_libro(id, titulo, autor, isbn, disponible=True):
@@ -165,10 +186,12 @@ def buscar_libros_por_coincidencia(texto):
 
     return resultado
 
+
 usuarios = []
 
 
 class Usuario:
+
     def __init__(self, id, nombre, apellidos, email, habilitado=True):
         self.id = id
         self.nombre = nombre
