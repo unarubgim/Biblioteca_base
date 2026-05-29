@@ -301,5 +301,3 @@ de forma intencionada:
 
 No se debe reescribir todo desde cero. La mejora debe hacerse poco a poco,
 siempre con tests previos.
-
-Cambio temporal para probar git revert
