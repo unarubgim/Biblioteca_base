@@ -1,5 +1,6 @@
 libros = []
 prestamos = []
+logs = []
 
 
 class Libro:
@@ -50,16 +51,46 @@ def agregar_libro(titulo, autor):
     libros.append(libro)
 
 
-def prestar_libro(titulo):
-    for libro in libros:
-        if libro.titulo == titulo:
-            if libro.disponible:
-                libro.disponible = False
-                return "Libro prestado"
+def prestar_libro(libro_id, usuario_id=None):
+    if usuario_id is None:
+        titulo = libro_id
 
-            return "Libro no disponible"
+        for libro in libros:
+            if libro.titulo == titulo:
+                if libro.disponible:
+                    libro.disponible = False
+                    return "Libro prestado"
 
-    return "Libro no encontrado"
+                return "Libro no disponible"
+
+        return "Libro no encontrado"
+
+    libro = obtener_libro_por_id(libro_id)
+    usuario = obtener_usuario_por_id(usuario_id)
+
+    if libro is None:
+        return "Libro no encontrado"
+
+    if usuario is None:
+        return "Usuario no encontrado"
+
+    if not usuario.habilitado:
+        return "Usuario no habilitado"
+
+    if not libro.disponible:
+        return "Libro no disponible"
+
+    libro.disponible = False
+
+    prestamo = {
+        "libro_id": libro_id,
+        "usuario_id": usuario_id
+    }
+
+    prestamos.append(prestamo)
+    registrar_log(f"Usuario {usuario_id} ha prestado Libro {libro_id}")
+
+    return "Libro prestado"
 
 
 def devolver_libro(libro_id, usuario_id=None):
@@ -89,6 +120,7 @@ def devolver_libro(libro_id, usuario_id=None):
         if prestamo["libro_id"] == libro_id and prestamo["usuario_id"] == usuario_id:
             prestamos.remove(prestamo)
             libro.disponible = True
+            registrar_log(f"Usuario {usuario_id} ha devuelto Libro {libro_id}")
             return "Libro devuelto"
 
     return "Prestamo no encontrado"
@@ -291,3 +323,11 @@ def buscar_usuario_por_email(email):
             return usuario
 
     return None
+
+
+def registrar_log(mensaje):
+    logs.append(mensaje)
+
+
+def obtener_logs():
+    return logs
